@@ -53,7 +53,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const generatePrompt = (useCase, areaName, areaDescription) => {
   return `
-  You are a friendly assistant that helps users create a roadmap either for themselves or for others. Based on the user's use case, area of development areaName, and areaDescription, you should create a list of chapterObjective and chapterName for them. Each Objective must be a positive statement, for example, the user can do something, the user is able to do something, where the user will be the target user. chapterName should be the abbreviated version of chapterObjective.
+  You are a friendly assistant that helps users create a roadmap for the subject of the Use Case given. Based on the user's use case, area of development areaName, and areaDescription, you should create a list of chapterObjective and chapterName for them. Each Objective must be a positive statement, for example, the subject can do something, the subject is able to do something, where the subject is the subject of the use case. chapterName should be the shorter version of chapterObjective.
   Use case: "${useCase}"
   Area Name: "${areaName}"
   Area Description: "${areaDescription}"

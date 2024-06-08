@@ -1,4 +1,4 @@
-// "use client"
+// "use client";
 // import React, { useState, useEffect, useRef } from 'react';
 // import { usePathname } from 'next/navigation';
 // import { Button } from '@/components/ui/button';
@@ -92,7 +92,7 @@
 //         headers: {
 //           'Content-Type': 'application/json',
 //         },
-//         body: JSON.stringify({ useCase, areaName, areaDescription }),
+//         body: JSON.stringify({ useCase, areaName, areaDescription, approvedChapters }),
 //       });
 //       const data = await res.json();
 //       if (res.ok) {
@@ -110,8 +110,12 @@
 
 //   const handleDelete = async (index: number) => {
 //     const chapterID = approvedChapters[index].chapterID;
+//     const pathSegments = pathname.split('/');
+//     const mapID = pathSegments[pathSegments.length - 2];
+//     const areaID = pathSegments[pathSegments.length - 1];
+  
 //     try {
-//       const res = await fetch(`/api/chapters/${chapterID}`, {
+//       const res = await fetch(`/api/chapters/${mapID}/${areaID}/${chapterID}`, {
 //         method: 'DELETE',
 //       });
 //       if (res.ok) {
@@ -124,6 +128,7 @@
 //       setError('An error occurred while deleting the chapter.');
 //     }
 //   };
+  
 
 //   const handleEdit = (index: number) => {
 //     setEditIndex(index);
@@ -132,8 +137,12 @@
 
 //   const handleSave = async () => {
 //     const { chapterID, chapterName, chapterObjective } = editChapter;
+//     const pathSegments = pathname.split('/');
+//     const mapID = pathSegments[pathSegments.length - 2];
+//     const areaID = pathSegments[pathSegments.length - 1];
+  
 //     try {
-//       const res = await fetch(`/api/chapters/${chapterID}`, {
+//       const res = await fetch(`/api/chapters/${mapID}/${areaID}/${chapterID}`, {
 //         method: 'PATCH',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -152,6 +161,7 @@
 //       setError('An error occurred while saving the chapter.');
 //     }
 //   };
+  
 
 //   const handleApprove = async (index: number) => {
 //     const approvedChapter = chapters[index];
@@ -422,7 +432,7 @@
 
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -446,6 +456,7 @@ const Chapter = () => {
   const formRef = useRef<HTMLFormElement>(null);
 
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchChapterDetails = async () => {
@@ -514,7 +525,7 @@ const Chapter = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ useCase, areaName, areaDescription }),
+        body: JSON.stringify({ useCase, areaName, areaDescription, approvedChapters }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -532,8 +543,12 @@ const Chapter = () => {
 
   const handleDelete = async (index: number) => {
     const chapterID = approvedChapters[index].chapterID;
+    const pathSegments = pathname.split('/');
+    const mapID = pathSegments[pathSegments.length - 2];
+    const areaID = pathSegments[pathSegments.length - 1];
+  
     try {
-      const res = await fetch(`/api/chapters/${chapterID}`, {
+      const res = await fetch(`/api/chapters/${mapID}/${areaID}/${chapterID}`, {
         method: 'DELETE',
       });
       if (res.ok) {
@@ -546,6 +561,7 @@ const Chapter = () => {
       setError('An error occurred while deleting the chapter.');
     }
   };
+  
 
   const handleEdit = (index: number) => {
     setEditIndex(index);
@@ -554,8 +570,12 @@ const Chapter = () => {
 
   const handleSave = async () => {
     const { chapterID, chapterName, chapterObjective } = editChapter;
+    const pathSegments = pathname.split('/');
+    const mapID = pathSegments[pathSegments.length - 2];
+    const areaID = pathSegments[pathSegments.length - 1];
+  
     try {
-      const res = await fetch(`/api/chapters/${chapterID}`, {
+      const res = await fetch(`/api/chapters/${mapID}/${areaID}/${chapterID}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -574,6 +594,7 @@ const Chapter = () => {
       setError('An error occurred while saving the chapter.');
     }
   };
+  
 
   const handleApprove = async (index: number) => {
     const approvedChapter = chapters[index];
@@ -703,14 +724,18 @@ const Chapter = () => {
           {approvedChapters.length > 0 && (
             <div className="mt-4">
               {approvedChapters.map((chapter, index) => (
-                <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-md mb-4 relative">
+                <div
+                  key={index}
+                  className="bg-gray-100 p-4 rounded-lg shadow-md mb-4 relative cursor-pointer"
+                  onClick={() => router.push(`/roadmap/${pathname.split('/')[2]}/${pathname.split('/')[3]}/${chapter.chapterID}`)}
+                >
                   <div className='flex justify-between items-center space-x-4 mb-3'> 
                     <h2 className="text-xl font-semibold">{chapter.chapterName}</h2>
                     <div className=" flex space-x-2 top-0 right-0 items-start">
-                      <Button className='bg-transparent border-none hover:bg-white' variant="outline" size="icon" onClick={() => handleEdit(index)}>
+                      <Button className='bg-transparent border-none hover:bg-white' variant="outline" size="icon" onClick={(e) => { e.stopPropagation(); handleEdit(index); }}>
                         <FaEdit />
                       </Button>
-                      <Button className='bg-transparent border-none hover:bg-white' variant="outline" size="icon" onClick={() => handleDelete(index)}>
+                      <Button className='bg-transparent border-none hover:bg-white' variant="outline" size="icon" onClick={(e) => { e.stopPropagation(); handleDelete(index); }}>
                         <FaTrash />
                       </Button>
                   </div>

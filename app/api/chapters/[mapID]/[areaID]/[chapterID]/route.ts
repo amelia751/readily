@@ -15,8 +15,8 @@ export async function GET(req: NextRequest, { params }: { params: { chapterID: s
       return NextResponse.json({ message: 'Chapter not found' }, { status: 404 });
     }
 
-    const keyArea = roadmap.keyAreas[0];
-    const chapter = keyArea.chapters.find(chapter => chapter.chapterID === chapterID);
+    const keyArea = roadmap.keyAreas.find(area => area.chapters.some(chap => chap.chapterID === chapterID));
+    const chapter = keyArea?.chapters.find(chap => chap.chapterID === chapterID);
 
     if (!chapter) {
       return NextResponse.json({ message: 'Chapter not found' }, { status: 404 });
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: { chapterID: s
     return NextResponse.json({ message: 'Error fetching chapter', error: error.message }, { status: 500 });
   }
 }
+
 
 // PATCH request to update a specific chapter
 export async function PATCH(req: NextRequest, { params }: { params: { chapterID: string } }) {
@@ -57,14 +58,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { chapterID:
       return NextResponse.json({ message: 'Chapter not found' }, { status: 404 });
     }
 
-    const keyArea = roadmap.keyAreas[0];
-    const updatedChapter = keyArea.chapters.find(chapter => chapter.chapterID === chapterID);
+    const keyArea = roadmap.keyAreas.find(area => area.chapters.some(chap => chap.chapterID === chapterID));
+    const updatedChapter = keyArea?.chapters.find(chap => chap.chapterID === chapterID);
 
     return NextResponse.json(updatedChapter, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error updating chapter', error: error.message }, { status: 500 });
   }
 }
+
+
 
 // DELETE request to delete a specific chapter
 export async function DELETE(req: NextRequest, { params }: { params: { chapterID: string } }) {

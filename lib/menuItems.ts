@@ -1,9 +1,9 @@
 export const menuItems = [
     {
-      category: 'Courses',
+      category: 'Roadmap',
       items: [
-        { title: 'Roadmap', href: '/roadmap', description: '' },
-        { title: 'AP Microeconomics', href: '/ap-microeconomics', description: 'Description for AP Microeconomics' },
+        { title: 'Create Roadmap', href: '/roadmap', description: '' },
+        { title: 'Your Roadmaps', href: '/ap-microeconomics', description: '' },
       ],
     },
     {
