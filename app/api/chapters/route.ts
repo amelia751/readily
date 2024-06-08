@@ -1,238 +1,130 @@
 // import { NextResponse } from 'next/server';
 // import { v4 as uuidv4 } from 'uuid';
-// import Chapter from '@/models/Chapter';
+// import Roadmap from '@/models/Roadmap';
 // import connect from '@/utils/db';
 
-// // POST request to create a new chapter
+// // POST request to create a new key area in a roadmap
 // export const POST = async (request) => {
 //   await connect();
 
-//   const { chapterName, objective, score } = await request.json();
+//   const { mapID, areaName, areaDescription } = await request.json();
 
 //   try {
-//     const newChapter = new Chapter({
-//       chapterID: uuidv4(), // Generate UUID for chapterID
-//       chapterName,
-//       objective,
-//       score,
-//       modules: [],
-//     });
-
-//     const savedChapter = await newChapter.save();
-
-//     return new NextResponse(JSON.stringify(savedChapter), {
-//       status: 201,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error creating chapter', error: error.message }), {
-//       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   }
-// };
-
-// // GET request to fetch all chapters
-// export const GET = async () => {
-//   await connect();
-
-//   try {
-//     const chapters = await Chapter.find({});
-//     return new NextResponse(JSON.stringify(chapters), {
-//       status: 200,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error fetching chapters', error: error.message }), {
-//       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   }
-// };
-
-// // PATCH request to update an existing chapter or add a module
-// export const PATCH = async (request) => {
-//   await connect();
-
-//   const { chapterID, chapterName, objective, score, module } = await request.json();
-
-//   try {
-//     const updateData = { chapterName, objective, score };
-//     if (module) {
-//       updateData.$push = { modules: module };
-//     }
-
-//     const updatedChapter = await Chapter.findOneAndUpdate(
-//       { chapterID },
-//       updateData,
-//       { new: true } // Return the updated document
-//     );
-
-//     if (!updatedChapter) {
-//       return new NextResponse(JSON.stringify({ message: 'Chapter not found' }), {
-//         status: 404,
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//       });
-//     }
-
-//     return new NextResponse(JSON.stringify(updatedChapter), {
-//       status: 200,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error updating chapter', error: error.message }), {
-//       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   }
-// };
-
-
-
-
-
-// import { NextResponse } from 'next/server';
-// import { v4 as uuidv4 } from 'uuid';
-// import KeyArea from '@/models/KeyArea';
-// import connect from '@/utils/db';
-
-// // POST request to create a new chapter in a key area
-// export const POST = async (request) => {
-//   await connect();
-
-//   const { areaID, chapterName, objective, score } = await request.json();
-
-//   try {
-//     const newChapter = {
-//       chapterID: uuidv4(), // Generate UUID for chapterID
-//       areaID,
-//       chapterName,
-//       objective,
-//       score,
-//       modules: [],
+//     const newKeyArea = {
+//       areaID: uuidv4(), // Generate UUID for areaID
+//       mapID,
+//       areaName,
+//       areaDescription,
+//       chapters: [],
 //     };
 
-//     const updatedKeyArea = await KeyArea.findOneAndUpdate(
-//       { areaID },
-//       { $push: { chapters: newChapter } },
+//     const updatedRoadmap = await Roadmap.findOneAndUpdate(
+//       { mapID: mapID },
+//       { $push: { keyAreas: newKeyArea } },
 //       { new: true } // Return the updated document
 //     );
 
-//     if (!updatedKeyArea) {
-//       return new NextResponse(JSON.stringify({ message: 'Key area not found' }), {
+//     if (!updatedRoadmap) {
+//       return NextResponse.json({ message: 'Roadmap not found' }, {
 //         status: 404,
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
 //       });
 //     }
 
-//     return new NextResponse(JSON.stringify(updatedKeyArea), {
+//     return NextResponse.json(newKeyArea, {
 //       status: 201,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
 //     });
 //   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error creating chapter', error: error.message }), {
+//     return NextResponse.json({ message: 'Error creating key area', error: error.message }, {
 //       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
 //     });
 //   }
 // };
 
-// // GET request to fetch all chapters for a specific key area
+// // GET request to fetch all key areas for a specific roadmap
 // export const GET = async (request) => {
 //   await connect();
 
-//   const { areaID } = await request.json();
+//   const { mapID } = await request.json();
 
 //   try {
-//     const keyArea = await KeyArea.findOne({ areaID });
-//     if (!keyArea) {
-//       return new NextResponse(JSON.stringify({ message: 'Key area not found' }), {
+//     const roadmap = await Roadmap.findOne({ mapID: mapID });
+//     if (!roadmap) {
+//       return NextResponse.json({ message: 'Roadmap not found' }, {
 //         status: 404,
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
 //       });
 //     }
-//     return new NextResponse(JSON.stringify(keyArea.chapters), {
+//     return NextResponse.json(roadmap.keyAreas, {
 //       status: 200,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
 //     });
 //   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error fetching chapters', error: error.message }), {
+//     return NextResponse.json({ message: 'Error fetching key areas', error: error.message }, {
 //       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
 //     });
 //   }
 // };
 
-// // PATCH request to update an existing chapter
+// // PATCH request to update an existing key area
 // export const PATCH = async (request) => {
 //   await connect();
 
-//   const { chapterID, areaID, chapterName, objective, score } = await request.json();
+//   const { areaID, mapID, areaName, areaDescription } = await request.json();
 
 //   try {
-//     const keyArea = await KeyArea.findOneAndUpdate(
-//       { areaID, "chapters.chapterID": chapterID },
+//     const roadmap = await Roadmap.findOneAndUpdate(
+//       { mapID: mapID, "keyAreas.areaID": areaID },
 //       {
 //         $set: {
-//           "chapters.$.chapterName": chapterName,
-//           "chapters.$.objective": objective,
-//           "chapters.$.score": score,
+//           "keyAreas.$.areaName": areaName,
+//           "keyAreas.$.areaDescription": areaDescription,
 //         }
 //       },
 //       { new: true }
 //     );
 
-//     if (!keyArea) {
-//       return new NextResponse(JSON.stringify({ message: 'Chapter not found' }), {
+//     if (!roadmap) {
+//       return NextResponse.json({ message: 'Key area not found' }, {
 //         status: 404,
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
 //       });
 //     }
 
-//     return new NextResponse(JSON.stringify(keyArea), {
+//     return NextResponse.json(roadmap, {
 //       status: 200,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
 //     });
 //   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error updating chapter', error: error.message }), {
+//     return NextResponse.json({ message: 'Error updating key area', error: error.message }, {
 //       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
 //     });
 //   }
 // };
 
+// // DELETE request to delete a key area
+// export const DELETE = async (request) => {
+//   await connect();
+
+//   const { areaID } = await request.json();
+
+//   try {
+//     const roadmap = await Roadmap.findOneAndUpdate(
+//       { "keyAreas.areaID": areaID },
+//       { $pull: { keyAreas: { areaID: areaID } } },
+//       { new: true }
+//     );
+
+//     if (!roadmap) {
+//       return NextResponse.json({ message: 'Key area not found' }, {
+//         status: 404,
+//       });
+//     }
+
+//     return NextResponse.json({ message: 'Key area deleted successfully' }, {
+//       status: 200,
+//     });
+//   } catch (error) {
+//     return NextResponse.json({ message: 'Error deleting key area', error: error.message }, {
+//       status: 500,
+//     });
+//   }
+// };
 
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
@@ -243,46 +135,35 @@ import connect from '@/utils/db';
 export const POST = async (request) => {
   await connect();
 
-  const { roadmapID, areaID, chapterName, objective, score } = await request.json();
+  const { mapID, areaID, chapterName, chapterObjective } = await request.json();
 
   try {
     const newChapter = {
       chapterID: uuidv4(), // Generate UUID for chapterID
-      roadmapID,
-      areaID,
       chapterName,
-      objective,
-      score,
-      modules: [],
+      chapterObjective,
+      chapterScore: null, // Automatically set to null
+      modules: [], // Automatically set to an empty array
     };
 
     const updatedRoadmap = await Roadmap.findOneAndUpdate(
-      { mapID: roadmapID, "keyAreas.areaID": areaID },
+      { mapID: mapID, "keyAreas.areaID": areaID },
       { $push: { "keyAreas.$.chapters": newChapter } },
       { new: true } // Return the updated document
     );
 
     if (!updatedRoadmap) {
-      return new NextResponse(JSON.stringify({ message: 'Key area not found' }), {
+      return NextResponse.json({ message: 'Key area not found' }, {
         status: 404,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
     }
 
-    return new NextResponse(JSON.stringify(updatedRoadmap), {
+    return NextResponse.json(newChapter, {
       status: 201,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
   } catch (error) {
-    return new NextResponse(JSON.stringify({ message: 'Error creating chapter', error: error.message }), {
+    return NextResponse.json({ message: 'Error creating chapter', error: error.message }, {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
   }
 };
@@ -291,78 +172,22 @@ export const POST = async (request) => {
 export const GET = async (request) => {
   await connect();
 
-  const { roadmapID, areaID } = await request.json();
+  const { mapID, areaID } = await request.json();
 
   try {
-    const roadmap = await Roadmap.findOne({ mapID: roadmapID, "keyAreas.areaID": areaID });
+    const roadmap = await Roadmap.findOne({ mapID: mapID, "keyAreas.areaID": areaID }, { "keyAreas.$": 1 });
     if (!roadmap) {
-      return new NextResponse(JSON.stringify({ message: 'Key area not found' }), {
+      return NextResponse.json({ message: 'Key area not found' }, {
         status: 404,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
     }
-    const keyArea = roadmap.keyAreas.find(ka => ka.areaID === areaID);
-    return new NextResponse(JSON.stringify(keyArea.chapters), {
+    const keyArea = roadmap.keyAreas[0];
+    return NextResponse.json(keyArea.chapters, {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
   } catch (error) {
-    return new NextResponse(JSON.stringify({ message: 'Error fetching chapters', error: error.message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
-};
-
-// PATCH request to update an existing chapter
-export const PATCH = async (request) => {
-  await connect();
-
-  const { chapterID, areaID, roadmapID, chapterName, objective, score } = await request.json();
-
-  try {
-    const roadmap = await Roadmap.findOneAndUpdate(
-      { mapID: roadmapID, "keyAreas.areaID": areaID, "keyAreas.chapters.chapterID": chapterID },
-      {
-        $set: {
-          "keyAreas.$.chapters.$[chap].chapterName": chapterName,
-          "keyAreas.$.chapters.$[chap].objective": objective,
-          "keyAreas.$.chapters.$[chap].score": score,
-        }
-      },
-      {
-        arrayFilters: [{ "chap.chapterID": chapterID }],
-        new: true
-      }
+    return NextResponse.json({ message: 'Error fetching chapters', error: error.message }, {
+      status: 500 },
     );
-
-    if (!roadmap) {
-      return new NextResponse(JSON.stringify({ message: 'Chapter not found' }), {
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    }
-
-    return new NextResponse(JSON.stringify(roadmap), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  } catch (error) {
-    return new NextResponse(JSON.stringify({ message: 'Error updating chapter', error: error.message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
   }
 };

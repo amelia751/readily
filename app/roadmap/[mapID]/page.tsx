@@ -1,12 +1,10 @@
-import Roadmap from "@/components/Roadmap";
+import KeyArea from "@/components/KeyArea";
 
 export default function Home() {
   return (
     <main className="flex">
-      <Roadmap />
+      <KeyArea />
     </main>
   );
 }
-
-
 

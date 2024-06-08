@@ -1,3 +1,324 @@
+// "use client"
+// import { useState } from 'react';
+// import { v4 as uuidv4 } from 'uuid';
+
+// // DnD
+// import {
+//   DndContext,
+//   DragEndEvent,
+//   DragOverlay,
+//   DragStartEvent,
+//   KeyboardSensor,
+//   PointerSensor,
+//   UniqueIdentifier,
+//   closestCorners,
+//   useSensor,
+//   useSensors,
+//   useDroppable,
+// } from '@dnd-kit/core';
+// import {
+//   SortableContext,
+//   arrayMove,
+//   sortableKeyboardCoordinates,
+// } from '@dnd-kit/sortable';
+
+// // Components
+// import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+// import Module from '@/components/Module';
+// import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+// import { Input } from '@/components/ui/input';
+// import { Button } from '@/components/ui/button';
+
+// type DNDType = {
+//   id: UniqueIdentifier;
+//   title: string;
+//   modules: {
+//     id: UniqueIdentifier;
+//     title: string;
+//   }[];
+// };
+
+// export default function Home() {
+//   const [skills, setSkills] = useState<DNDType[]>([]);
+//   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+//   const [currentSkillId, setCurrentSkillId] = useState<UniqueIdentifier>();
+//   const [skillName, setSkillName] = useState('');
+//   const [moduleName, setModuleName] = useState('');
+//   const [showAddSkillModal, setShowAddSkillModal] = useState(false);
+//   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
+
+//   const onAddSkill = () => {
+//     if (!skillName) return;
+//     const id = `skill-${uuidv4()}`;
+//     setSkills([
+//       ...skills,
+//       {
+//         id,
+//         title: skillName,
+//         modules: [],
+//       },
+//     ]);
+//     setSkillName('');
+//     setShowAddSkillModal(false);
+//   };
+
+//   const onAddModule = () => {
+//     if (!moduleName) return;
+//     const id = `module-${uuidv4()}`;
+//     const skill = skills.find((skill) => skill.id === currentSkillId);
+//     if (!skill) return;
+//     skill.modules.push({
+//       id,
+//       title: moduleName,
+//     });
+//     setSkills([...skills]);
+//     setModuleName('');
+//     setShowAddModuleModal(false);
+//   };
+
+//   // Find the value of the modules
+//   function findValueOfModules(id: UniqueIdentifier | undefined, type: string) {
+//     if (type === 'skill') {
+//       return skills.find((skill) => skill.id === id);
+//     }
+//     if (type === 'module') {
+//       return skills.find((skill) =>
+//         skill.modules.find((module) => module.id === id),
+//       );
+//     }
+//   }
+
+//   const findModuleTitle = (id: UniqueIdentifier | undefined) => {
+//     const skill = findValueOfModules(id, 'module');
+//     if (!skill) return '';
+//     const module = skill.modules.find((module) => module.id === id);
+//     if (!module) return '';
+//     return module.title;
+//   };
+
+//   const findSkillTitle = (id: UniqueIdentifier | undefined) => {
+//     const skill = findValueOfModules(id, 'skill');
+//     if (!skill) return '';
+//     return skill.title;
+//   };
+
+//   const findSkillModules = (id: UniqueIdentifier | undefined) => {
+//     const skill = findValueOfModules(id, 'skill');
+//     if (!skill) return [];
+//     return skill.modules;
+//   };
+
+//   // DND Handlers
+//   const sensors = useSensors(
+//     useSensor(PointerSensor),
+//     useSensor(KeyboardSensor, {
+//       coordinateGetter: sortableKeyboardCoordinates,
+//     }),
+//   );
+
+//   function handleDragStart(event: DragStartEvent) {
+//     const { active } = event;
+//     const { id } = active;
+//     setActiveId(id);
+//   }
+
+//   const handleDragEnd = (event: DragEndEvent) => {
+//     const { active, over } = event;
+
+//     if (!over) return;
+
+//     // Handling module Sorting and moving to different skills
+//     if (active.id.toString().includes('module')) {
+//       const activeSkill = findValueOfModules(active.id, 'module');
+//       const overSkill = findValueOfModules(over.id, 'module') || findValueOfModules(over.id, 'skill');
+
+//       if (!activeSkill || !overSkill) return;
+
+//       const activeSkillIndex = skills.findIndex(
+//         (skill) => skill.id === activeSkill.id,
+//       );
+//       const overSkillIndex = skills.findIndex(
+//         (skill) => skill.id === overSkill.id,
+//       );
+
+//       const activeModuleIndex = activeSkill.modules.findIndex(
+//         (module) => module.id === active.id,
+//       );
+
+//       if (activeSkillIndex === overSkillIndex) {
+//         let newModules = [...skills];
+//         newModules[activeSkillIndex].modules = arrayMove(
+//           newModules[activeSkillIndex].modules,
+//           activeModuleIndex,
+//           over.id.toString().includes('module') ? overSkill.modules.findIndex((module) => module.id === over.id) : overSkill.modules.length,
+//         );
+//         setSkills(newModules);
+//       } else {
+//         let newModules = [...skills];
+//         const [removedModule] = newModules[activeSkillIndex].modules.splice(
+//           activeModuleIndex,
+//           1,
+//         );
+//         newModules[overSkillIndex].modules.splice(
+//           over.id.toString().includes('module') ? overSkill.modules.findIndex((module) => module.id === over.id) : overSkill.modules.length,
+//           0,
+//           removedModule,
+//         );
+//         setSkills(newModules);
+//       }
+//     }
+
+//     // Handling Skill Sorting
+//     if (
+//       active.id.toString().includes('skill') &&
+//       over?.id.toString().includes('skill') &&
+//       active.id !== over.id
+//     ) {
+//       const activeSkillIndex = skills.findIndex(
+//         (skill) => skill.id === active.id,
+//       );
+//       const overSkillIndex = skills.findIndex(
+//         (skill) => skill.id === over.id,
+//       );
+//       let newSkills = [...skills];
+//       newSkills = arrayMove(newSkills, activeSkillIndex, overSkillIndex);
+//       setSkills(newSkills);
+//     }
+//     setActiveId(null);
+//   };
+
+//   return (
+//     <div className="mx-auto max-w-7xl py-10">
+//       {/* Add Skill Dialog */}
+//       <Dialog open={showAddSkillModal} onOpenChange={setShowAddSkillModal}>
+//         <DialogTrigger asChild>
+//           <Button variant="outline" onClick={() => setShowAddSkillModal(true)}>Add Skill</Button>
+//         </DialogTrigger>
+//         <DialogContent className="sm:max-w-[425px]">
+//           <DialogHeader>
+//             <DialogTitle>Add Skill</DialogTitle>
+//           </DialogHeader>
+//           <div className="grid gap-4 py-4">
+//             <div className="grid grid-cols-4 items-center gap-4">
+//               <Input
+//                 type="text"
+//                 placeholder="Skill Title"
+//                 name="skillname"
+//                 value={skillName}
+//                 onChange={(e) => setSkillName(e.target.value)}
+//               />
+//             </div>
+//           </div>
+//           <DialogFooter>
+//             <Button type="submit" onClick={onAddSkill}>Add Skill</Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+//       {/* Add Module Dialog */}
+//       <Dialog open={showAddModuleModal} onOpenChange={setShowAddModuleModal}>
+//         <DialogTrigger asChild>
+//           <Button variant="outline" onClick={() => setShowAddModuleModal(true)}>Add Module</Button>
+//         </DialogTrigger>
+//         <DialogContent className="sm:max-w-[425px]">
+//           <DialogHeader>
+//             <DialogTitle>Add Module</DialogTitle>
+//           </DialogHeader>
+//           <div className="grid gap-4 py-4">
+//             <div className="grid grid-cols-4 items-center gap-4">
+//               <Input
+//                 type="text"
+//                 placeholder="Module Title"
+//                 name="modulename"
+//                 value={moduleName}
+//                 onChange={(e) => setModuleName(e.target.value)}
+//               />
+//             </div>
+//           </div>
+//           <DialogFooter>
+//             <Button type="submit" onClick={onAddModule}>Add Module</Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+//       <div className="mt-10">
+//         <div className="grid grid-cols-3 gap-6">
+//           <DndContext
+//             sensors={sensors}
+//             collisionDetection={closestCorners}
+//             onDragStart={handleDragStart}
+//             onDragEnd={handleDragEnd}
+//           >
+//             <SortableContext items={skills.map((i) => i.id)}>
+//               {skills.map((skill) => (
+//                 <DroppableSkill key={skill.id} id={skill.id} modules={skill.modules}>
+//                   <Card className="w-[350px]">
+//                     <CardHeader>
+//                       <CardTitle>{skill.title}</CardTitle>
+//                     </CardHeader>
+//                     <CardContent>
+//                       <SortableContext items={skill.modules.map((i) => i.id)}>
+//                         <div className="flex items-start flex-col gap-y-4">
+//                           {skill.modules.map((module) => (
+//                             <Module title={module.title} id={module.id} key={module.id} />
+//                           ))}
+//                         </div>
+//                       </SortableContext>
+//                     </CardContent>
+//                     <CardFooter className="flex justify-between">
+//                       <Button variant="outline" onClick={() => {
+//                         setShowAddModuleModal(true);
+//                         setCurrentSkillId(skill.id);
+//                       }}>
+//                         Add Module
+//                       </Button>
+//                     </CardFooter>
+//                   </Card>
+//                 </DroppableSkill>
+//               ))}
+//             </SortableContext>
+//             <DragOverlay adjustScale={false}>
+//               {/* Drag Overlay For Module */}
+//               {activeId && activeId.toString().includes('module') && (
+//                 <Module id={activeId} title={findModuleTitle(activeId)} />
+//               )}
+//               {/* Drag Overlay For Skill */}
+//               {activeId && activeId.toString().includes('skill') && (
+//                 <Card id={activeId.toString()} className="w-[350px]">
+//                   <CardHeader>
+//                     <CardTitle>{findSkillTitle(activeId)}</CardTitle>
+//                   </CardHeader>
+//                   <CardContent>
+//                     {findSkillModules(activeId).map((module) => (
+//                       <Module key={module.id} title={module.title} id={module.id} />
+//                     ))}
+//                   </CardContent>
+//                 </Card>
+//               )}
+//             </DragOverlay>
+//           </DndContext>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// interface DroppableSkillProps {
+//   id: UniqueIdentifier;
+//   modules: { id: UniqueIdentifier; title: string }[];
+//   children: React.ReactNode;
+// }
+
+// const DroppableSkill = ({ id, modules, children }: DroppableSkillProps) => {
+//   const { setNodeRef } = useDroppable({
+//     id,
+//   });
+
+//   return (
+//     <div ref={setNodeRef}>
+//       {children}
+//     </div>
+//   );
+// };
+
 "use client"
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,73 +360,73 @@ type DNDType = {
 };
 
 export default function Home() {
-  const [skills, setSkills] = useState<DNDType[]>([]);
+  const [chapters, setChapters] = useState<DNDType[]>([]);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [currentSkillId, setCurrentSkillId] = useState<UniqueIdentifier>();
-  const [skillName, setSkillName] = useState('');
+  const [currentChapterId, setCurrentChapterId] = useState<UniqueIdentifier>();
+  const [chapterName, setChapterName] = useState('');
   const [moduleName, setModuleName] = useState('');
-  const [showAddSkillModal, setShowAddSkillModal] = useState(false);
+  const [showAddChapterModal, setShowAddChapterModal] = useState(false);
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
 
-  const onAddSkill = () => {
-    if (!skillName) return;
-    const id = `skill-${uuidv4()}`;
-    setSkills([
-      ...skills,
+  const onAddChapter = () => {
+    if (!chapterName) return;
+    const id = `chapter-${uuidv4()}`;
+    setChapters([
+      ...chapters,
       {
         id,
-        title: skillName,
+        title: chapterName,
         modules: [],
       },
     ]);
-    setSkillName('');
-    setShowAddSkillModal(false);
+    setChapterName('');
+    setShowAddChapterModal(false);
   };
 
   const onAddModule = () => {
     if (!moduleName) return;
     const id = `module-${uuidv4()}`;
-    const skill = skills.find((skill) => skill.id === currentSkillId);
-    if (!skill) return;
-    skill.modules.push({
+    const chapter = chapters.find((chapter) => chapter.id === currentChapterId);
+    if (!chapter) return;
+    chapter.modules.push({
       id,
       title: moduleName,
     });
-    setSkills([...skills]);
+    setChapters([...chapters]);
     setModuleName('');
     setShowAddModuleModal(false);
   };
 
   // Find the value of the modules
   function findValueOfModules(id: UniqueIdentifier | undefined, type: string) {
-    if (type === 'skill') {
-      return skills.find((skill) => skill.id === id);
+    if (type === 'chapter') {
+      return chapters.find((chapter) => chapter.id === id);
     }
     if (type === 'module') {
-      return skills.find((skill) =>
-        skill.modules.find((module) => module.id === id),
+      return chapters.find((chapter) =>
+        chapter.modules.find((module) => module.id === id),
       );
     }
   }
 
   const findModuleTitle = (id: UniqueIdentifier | undefined) => {
-    const skill = findValueOfModules(id, 'module');
-    if (!skill) return '';
-    const module = skill.modules.find((module) => module.id === id);
+    const chapter = findValueOfModules(id, 'module');
+    if (!chapter) return '';
+    const module = chapter.modules.find((module) => module.id === id);
     if (!module) return '';
     return module.title;
   };
 
-  const findSkillTitle = (id: UniqueIdentifier | undefined) => {
-    const skill = findValueOfModules(id, 'skill');
-    if (!skill) return '';
-    return skill.title;
+  const findChapterTitle = (id: UniqueIdentifier | undefined) => {
+    const chapter = findValueOfModules(id, 'chapter');
+    if (!chapter) return '';
+    return chapter.title;
   };
 
-  const findSkillModules = (id: UniqueIdentifier | undefined) => {
-    const skill = findValueOfModules(id, 'skill');
-    if (!skill) return [];
-    return skill.modules;
+  const findChapterModules = (id: UniqueIdentifier | undefined) => {
+    const chapter = findValueOfModules(id, 'chapter');
+    if (!chapter) return [];
+    return chapter.modules;
   };
 
   // DND Handlers
@@ -127,90 +448,90 @@ export default function Home() {
 
     if (!over) return;
 
-    // Handling module Sorting and moving to different skills
+    // Handling module Sorting and moving to different chapters
     if (active.id.toString().includes('module')) {
-      const activeSkill = findValueOfModules(active.id, 'module');
-      const overSkill = findValueOfModules(over.id, 'module') || findValueOfModules(over.id, 'skill');
+      const activeChapter = findValueOfModules(active.id, 'module');
+      const overChapter = findValueOfModules(over.id, 'module') || findValueOfModules(over.id, 'chapter');
 
-      if (!activeSkill || !overSkill) return;
+      if (!activeChapter || !overChapter) return;
 
-      const activeSkillIndex = skills.findIndex(
-        (skill) => skill.id === activeSkill.id,
+      const activeChapterIndex = chapters.findIndex(
+        (chapter) => chapter.id === activeChapter.id,
       );
-      const overSkillIndex = skills.findIndex(
-        (skill) => skill.id === overSkill.id,
+      const overChapterIndex = chapters.findIndex(
+        (chapter) => chapter.id === overChapter.id,
       );
 
-      const activeModuleIndex = activeSkill.modules.findIndex(
+      const activeModuleIndex = activeChapter.modules.findIndex(
         (module) => module.id === active.id,
       );
 
-      if (activeSkillIndex === overSkillIndex) {
-        let newModules = [...skills];
-        newModules[activeSkillIndex].modules = arrayMove(
-          newModules[activeSkillIndex].modules,
+      if (activeChapterIndex === overChapterIndex) {
+        let newModules = [...chapters];
+        newModules[activeChapterIndex].modules = arrayMove(
+          newModules[activeChapterIndex].modules,
           activeModuleIndex,
-          over.id.toString().includes('module') ? overSkill.modules.findIndex((module) => module.id === over.id) : overSkill.modules.length,
+          over.id.toString().includes('module') ? overChapter.modules.findIndex((module) => module.id === over.id) : overChapter.modules.length,
         );
-        setSkills(newModules);
+        setChapters(newModules);
       } else {
-        let newModules = [...skills];
-        const [removedModule] = newModules[activeSkillIndex].modules.splice(
+        let newModules = [...chapters];
+        const [removedModule] = newModules[activeChapterIndex].modules.splice(
           activeModuleIndex,
           1,
         );
-        newModules[overSkillIndex].modules.splice(
-          over.id.toString().includes('module') ? overSkill.modules.findIndex((module) => module.id === over.id) : overSkill.modules.length,
+        newModules[overChapterIndex].modules.splice(
+          over.id.toString().includes('module') ? overChapter.modules.findIndex((module) => module.id === over.id) : overChapter.modules.length,
           0,
           removedModule,
         );
-        setSkills(newModules);
+        setChapters(newModules);
       }
     }
 
-    // Handling Skill Sorting
+    // Handling Chapter Sorting
     if (
-      active.id.toString().includes('skill') &&
-      over?.id.toString().includes('skill') &&
+      active.id.toString().includes('chapter') &&
+      over?.id.toString().includes('chapter') &&
       active.id !== over.id
     ) {
-      const activeSkillIndex = skills.findIndex(
-        (skill) => skill.id === active.id,
+      const activeChapterIndex = chapters.findIndex(
+        (chapter) => chapter.id === active.id,
       );
-      const overSkillIndex = skills.findIndex(
-        (skill) => skill.id === over.id,
+      const overChapterIndex = chapters.findIndex(
+        (chapter) => chapter.id === over.id,
       );
-      let newSkills = [...skills];
-      newSkills = arrayMove(newSkills, activeSkillIndex, overSkillIndex);
-      setSkills(newSkills);
+      let newChapters = [...chapters];
+      newChapters = arrayMove(newChapters, activeChapterIndex, overChapterIndex);
+      setChapters(newChapters);
     }
     setActiveId(null);
   };
 
   return (
     <div className="mx-auto max-w-7xl py-10">
-      {/* Add Skill Dialog */}
-      <Dialog open={showAddSkillModal} onOpenChange={setShowAddSkillModal}>
+      {/* Add Chapter Dialog */}
+      <Dialog open={showAddChapterModal} onOpenChange={setShowAddChapterModal}>
         <DialogTrigger asChild>
-          <Button variant="outline" onClick={() => setShowAddSkillModal(true)}>Add Skill</Button>
+          <Button variant="outline" onClick={() => setShowAddChapterModal(true)}>Add Chapter</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add Skill</DialogTitle>
+            <DialogTitle>Add Chapter</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Input
                 type="text"
-                placeholder="Skill Title"
-                name="skillname"
-                value={skillName}
-                onChange={(e) => setSkillName(e.target.value)}
+                placeholder="Chapter Title"
+                name="chaptername"
+                value={chapterName}
+                onChange={(e) => setChapterName(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={onAddSkill}>Add Skill</Button>
+            <Button type="submit" onClick={onAddChapter}>Add Chapter</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -247,17 +568,17 @@ export default function Home() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={skills.map((i) => i.id)}>
-              {skills.map((skill) => (
-                <DroppableSkill key={skill.id} id={skill.id} modules={skill.modules}>
+            <SortableContext items={chapters.map((i) => i.id)}>
+              {chapters.map((chapter) => (
+                <DroppableChapter key={chapter.id} id={chapter.id} modules={chapter.modules}>
                   <Card className="w-[350px]">
                     <CardHeader>
-                      <CardTitle>{skill.title}</CardTitle>
+                      <CardTitle>{chapter.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <SortableContext items={skill.modules.map((i) => i.id)}>
+                      <SortableContext items={chapter.modules.map((i) => i.id)}>
                         <div className="flex items-start flex-col gap-y-4">
-                          {skill.modules.map((module) => (
+                          {chapter.modules.map((module) => (
                             <Module title={module.title} id={module.id} key={module.id} />
                           ))}
                         </div>
@@ -266,13 +587,13 @@ export default function Home() {
                     <CardFooter className="flex justify-between">
                       <Button variant="outline" onClick={() => {
                         setShowAddModuleModal(true);
-                        setCurrentSkillId(skill.id);
+                        setCurrentChapterId(chapter.id);
                       }}>
                         Add Module
                       </Button>
                     </CardFooter>
                   </Card>
-                </DroppableSkill>
+                </DroppableChapter>
               ))}
             </SortableContext>
             <DragOverlay adjustScale={false}>
@@ -280,14 +601,14 @@ export default function Home() {
               {activeId && activeId.toString().includes('module') && (
                 <Module id={activeId} title={findModuleTitle(activeId)} />
               )}
-              {/* Drag Overlay For Skill */}
-              {activeId && activeId.toString().includes('skill') && (
+              {/* Drag Overlay For Chapter */}
+              {activeId && activeId.toString().includes('chapter') && (
                 <Card id={activeId.toString()} className="w-[350px]">
                   <CardHeader>
-                    <CardTitle>{findSkillTitle(activeId)}</CardTitle>
+                    <CardTitle>{findChapterTitle(activeId)}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {findSkillModules(activeId).map((module) => (
+                    {findChapterModules(activeId).map((module) => (
                       <Module key={module.id} title={module.title} id={module.id} />
                     ))}
                   </CardContent>
@@ -301,13 +622,13 @@ export default function Home() {
   );
 }
 
-interface DroppableSkillProps {
+interface DroppableChapterProps {
   id: UniqueIdentifier;
   modules: { id: UniqueIdentifier; title: string }[];
   children: React.ReactNode;
 }
 
-const DroppableSkill = ({ id, modules, children }: DroppableSkillProps) => {
+const DroppableChapter = ({ id, modules, children }: DroppableChapterProps) => {
   const { setNodeRef } = useDroppable({
     id,
   });
@@ -318,3 +639,4 @@ const DroppableSkill = ({ id, modules, children }: DroppableSkillProps) => {
     </div>
   );
 };
+

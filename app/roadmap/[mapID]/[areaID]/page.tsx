@@ -1,12 +1,9 @@
-import Roadmap from "@/components/Roadmap";
+import Chapter from "@/components/Chapter";
 
 export default function Home() {
   return (
     <main className="flex">
-      <Roadmap />
+      <Chapter />
     </main>
   );
 }
-
-
-

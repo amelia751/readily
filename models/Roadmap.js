@@ -14,27 +14,29 @@ const moduleSchema = new Schema({
 });
 
 const chapterSchema = new Schema({
+  areaID: { type: String, required: true },
   chapterID: { type: String, unique: true },
-  areaID: { type: String, required: false },
   chapterName: { type: String, required: false },
-  objective: { type: String, required: false },
-  score: { type: Number, min: 1, max: 5, default: null },
+  chapterObjective: { type: String, required: false },
+  chapterScore: { type: Number, min: 1, max: 5, default: null },
   modules: [moduleSchema]
 });
 
 const keyAreaSchema = new Schema({
+  mapID: { type: String, required: true },
   areaID: { type: String, unique: true },
   areaName: { type: String, required: false },
-  roadmapID: { type: String, required: true },
+  areaDescription: { type: String, required: false },
   chapters: [chapterSchema]
 });
 
 const roadmapSchema = new Schema({
   mapID: { type: String, unique: true },
-  useCase: { type: String, required: true },
+  mapName: { type: String, required: false },
+  useCase: { type: String, required: false },
   keyAreas: [keyAreaSchema],
   published: { type: Boolean, default: false },
-  creator: { type: String, required: true }
+  creator: { type: String, required: false }
 });
 
 const Roadmap = mongoose.models.Roadmap || mongoose.model('Roadmap', roadmapSchema, 'roadmaps');
