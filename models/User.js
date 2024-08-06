@@ -8,6 +8,10 @@ const userSchema = new Schema({
     unique: true,
     required: true,
   },
+  role: {
+    type: String,
+    default: 'user',
+  },
 }, { timestamps: true, versionKey: false });
 
 export default mongoose.models.User || mongoose.model("User", userSchema, 'users');

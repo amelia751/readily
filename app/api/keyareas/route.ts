@@ -1,218 +1,29 @@
-// import { NextResponse } from 'next/server';
-// import { v4 as uuidv4 } from 'uuid';
-// import KeyArea from '@/models/KeyArea';
-// import connect from '@/utils/db';
+import { NextRequest, NextResponse } from 'next/server'; 
+import { v4 as uuidv4 } from 'uuid'; 
+import Roadmap from '@/models/Roadmap'; 
+import connect from '@/utils/db'; 
 
-// // POST request to create a new key area
-// export const POST = async (request) => {
-//   await connect();
+// POST request handler to create a new key area in a roadmap
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
+  await connect(); 
 
-//   const { areaName } = await request.json();
-
-//   try {
-//     const newKeyArea = new KeyArea({
-//       areaID: uuidv4(), // Generate UUID for areaID
-//       areaName,
-//       chapters: [],
-//     });
-
-//     const savedKeyArea = await newKeyArea.save();
-
-//     return new NextResponse(JSON.stringify(savedKeyArea), {
-//       status: 201,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error creating key area', error: error.message }), {
-//       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   }
-// };
-
-// // GET request to fetch all key areas
-// export const GET = async () => {
-//   await connect();
-
-//   try {
-//     const keyAreas = await KeyArea.find({});
-//     return new NextResponse(JSON.stringify(keyAreas), {
-//       status: 200,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error fetching key areas', error: error.message }), {
-//       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   }
-// };
-
-// // PATCH request to update an existing key area
-// export const PATCH = async (request) => {
-//   await connect();
-
-//   const { areaID, areaName } = await request.json();
-
-//   try {
-//     const updatedKeyArea = await KeyArea.findOneAndUpdate(
-//       { areaID },
-//       { areaName },
-//       { new: true } // Return the updated document
-//     );
-
-//     if (!updatedKeyArea) {
-//       return new NextResponse(JSON.stringify({ message: 'Key area not found' }), {
-//         status: 404,
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//       });
-//     }
-
-//     return new NextResponse(JSON.stringify(updatedKeyArea), {
-//       status: 200,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   } catch (error) {
-//     return new NextResponse(JSON.stringify({ message: 'Error updating key area', error: error.message }), {
-//       status: 500,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//   }
-// };
-
-
-// import { NextResponse } from 'next/server';
-// import { v4 as uuidv4 } from 'uuid';
-// import Roadmap from '@/models/Roadmap';
-// import connect from '@/utils/db';
-
-// // POST request to create a new key area in a roadmap
-// export const POST = async (request) => {
-//   await connect();
-
-//   const { mapID, areaName } = await request.json();
-
-//   try {
-//     const newKeyArea = {
-//       areaID: uuidv4(), // Generate UUID for areaID
-//       mapID,
-//       areaName,
-//       chapters: [],
-//     };
-
-//     const updatedRoadmap = await Roadmap.findOneAndUpdate(
-//       { mapID: mapID },
-//       { $push: { keyAreas: newKeyArea } },
-//       { new: true } // Return the updated document
-//     );
-
-//     if (!updatedRoadmap) {
-//       return NextResponse.json({ message: 'Roadmap not found' }, {
-//         status: 404,
-//       });
-//     }
-
-//     return NextResponse.json(updatedRoadmap, {
-//       status: 201,
-//     });
-//   } catch (error) {
-//     return NextResponse.json({ message: 'Error creating key area', error: error.message }, {
-//       status: 500,
-//     });
-//   }
-// };
-
-// // GET request to fetch all key areas for a specific roadmap
-// export const GET = async (request) => {
-//   await connect();
-
-//   const { mapID } = await request.json();
-
-//   try {
-//     const roadmap = await Roadmap.findOne({ mapID: mapID });
-//     if (!roadmap) {
-//       return NextResponse.json({ message: 'Roadmap not found' }, {
-//         status: 404,
-//       });
-//     }
-//     return NextResponse.json(roadmap.keyAreas, {
-//       status: 200,
-//     });
-//   } catch (error) {
-//     return NextResponse.json({ message: 'Error fetching key areas', error: error.message }, {
-//       status: 500,
-//     });
-//   }
-// };
-
-// // PATCH request to update an existing key area
-// export const PATCH = async (request) => {
-//   await connect();
-
-//   const { areaID, mapID, areaName } = await request.json();
-
-//   try {
-//     const roadmap = await Roadmap.findOneAndUpdate(
-//       { mapID: mapID, "keyAreas.areaID": areaID },
-//       {
-//         $set: {
-//           "keyAreas.$.areaName": areaName,
-//         }
-//       },
-//       { new: true }
-//     );
-
-//     if (!roadmap) {
-//       return NextResponse.json({ message: 'Key area not found' }, {
-//         status: 404,
-//       });
-//     }
-
-//     return NextResponse.json(roadmap, {
-//       status: 200,
-//     });
-//   } catch (error) {
-//     return NextResponse.json({ message: 'Error updating key area', error: error.message }, {
-//       status: 500,
-//     });
-//   }
-// };
-
-
-import { NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
-import Roadmap from '@/models/Roadmap';
-import connect from '@/utils/db';
-
-// POST request to create a new key area in a roadmap
-export const POST = async (request) => {
-  await connect();
-
-  const { mapID, areaName, areaDescription } = await request.json();
+  // Parse the request body to get mapID, areaName, and areaDescription
+  const { mapID, areaName, areaDescription }: { mapID: string; areaName: string; areaDescription: string } = await request.json();
 
   try {
+    // Generate a new areaID for the key area
+    const newAreaID = uuidv4();
+
+    // Create a new key area object
     const newKeyArea = {
-      areaID: uuidv4(), // Generate UUID for areaID
+      areaID: newAreaID,
       mapID,
       areaName,
       areaDescription,
-      chapters: [],
+      chapters: [], // Ensure chapters is an empty array
     };
 
+    // Update the roadmap with the new key area
     const updatedRoadmap = await Roadmap.findOneAndUpdate(
       { mapID: mapID },
       { $push: { keyAreas: newKeyArea } },
@@ -222,39 +33,42 @@ export const POST = async (request) => {
     if (!updatedRoadmap) {
       return NextResponse.json({ message: 'Roadmap not found' }, {
         status: 404,
-      });
+      }); 
     }
 
     return NextResponse.json(newKeyArea, {
       status: 201,
-    });
+    }); 
   } catch (error) {
-    return NextResponse.json({ message: 'Error creating key area', error: error.message }, {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'; 
+    return NextResponse.json({ message: 'Error creating key area', error: errorMessage }, {
       status: 500,
-    });
+    }); 
   }
 };
 
-// GET request to fetch all key areas for a specific roadmap
-export const GET = async (request) => {
-  await connect();
+// GET request handler to fetch key areas of a roadmap by mapID
+export const GET = async (request: NextRequest): Promise<NextResponse> => {
+  await connect(); // Connect to the database
 
-  const { mapID } = await request.json();
+  // Parse the request body to get mapID
+  const { mapID }: { mapID: string } = await request.json();
 
   try {
+    // Find the roadmap by mapID
     const roadmap = await Roadmap.findOne({ mapID: mapID });
     if (!roadmap) {
       return NextResponse.json({ message: 'Roadmap not found' }, {
         status: 404,
-      });
+      }); 
     }
     return NextResponse.json(roadmap.keyAreas, {
       status: 200,
-    });
+    }); 
   } catch (error) {
-    return NextResponse.json({ message: 'Error fetching key areas', error: error.message }, {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'; 
+    return NextResponse.json({ message: 'Error fetching key areas', error: errorMessage }, {
       status: 500,
-    });
+    }); 
   }
 };
-
